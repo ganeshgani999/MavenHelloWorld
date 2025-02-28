@@ -7,9 +7,8 @@ trigger:
 - master
 
 pool:
-  name: DemoAgent   # Your custom agent pool
-  demands:
-    - Agent.Name -equals PracticeAgent  # Specific agent name
+  name: DemoAgent
+  demands: PracticeAgent
 
 steps:
 - task: Maven@3

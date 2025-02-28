@@ -8,7 +8,9 @@ trigger:
 
 pool:
   name: DemoAgent
-  demands: PracticeAgent
+  demands:
+    - Agent.Name -equals PracticeAgent
+
 
 steps:
 - task: Maven@3

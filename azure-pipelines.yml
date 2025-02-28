@@ -4,23 +4,37 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 trigger:
-- master
+  - master
 
 pool:
   name: DemoAgent
   demands:
     - Agent.Name -equals PracticeAgent
 
-
 steps:
-- task: Maven@3
+- task: Maven@4  # Use Maven@4 (Recommended)
   inputs:
     mavenPomFile: 'pom.xml'
     mavenOptions: '-Xmx3072m'
     javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.17'  # Use '1.22' if Azure DevOps supports it
+    jdkVersionOption: '1.17'  # Use '22' if supported
     jdkArchitectureOption: 'x64'
     publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'clean package'
 
+- task: PublishTestResults@2  # Publish test results separately
+  inputs:
+    testResultsFormat: 'JUnit'
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    searchFolder: '$(System.DefaultWorkingDirectory)'
+    failTaskOnFailedTests: true
+
+- task: CopyFiles@2
+  inputs:
+    Contents: '**/*.war'  # Corrected pattern
+    TargetFolder: '$(build.artifactstagingdirectory)'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'warfile'
+    publishLocation: 'Container'
